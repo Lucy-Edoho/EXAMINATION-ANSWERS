@@ -3,6 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
 import logging
+from sqlalchemy_utils import database_exists, create_database
 
 # Set up logging
 logging.basicConfig(filename='scraping_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
@@ -55,17 +56,25 @@ try:
     df.to_csv(csv_file, index=False)
     logging.info(f"Data saved to CSV file: {csv_file}")
 
+    if not database_exists(f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{DATABASE_NAME}'):
+            logging.info('Database does not exist, creating a new one')
+            create_database(f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{DATABASE_NAME}')
+
+
     # Connect to PostgreSQL and create database if it doesn't exist
     engine = create_engine(f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{DATABASE_NAME}')
     conn = engine.connect()
     conn = conn.execution_options(isolation_level="AUTOCOMMIT")  # Set isolation level to AUTOCOMMIT
-    try:
-        conn.execute(f"CREATE DATABASE {DATABASE_NAME} WITH OWNER = {POSTGRES_USER} ENCODING = 'UTF8' CONNECTION LIMIT = -1;")
-        logging.info(f"Database {DATABASE_NAME} created successfully.")
-    except Exception as e:
-        logging.info(f"Database {DATABASE_NAME} already exists. Skipping creation.")
-    finally:
-        conn.close()
+    
+    
+    
+    # try:
+    #     conn.execute(f"CREATE DATABASE {DATABASE_NAME} WITH OWNER = {POSTGRES_USER} ENCODING = 'UTF8' CONNECTION LIMIT = -1;")
+    #     logging.info(f"Database {DATABASE_NAME} created successfully.")
+    # except Exception as e:
+    #     logging.info(f"Database {DATABASE_NAME} already exists. Skipping creation.")
+    # finally:
+    #     conn.close()
 
     # Reconnect to the specific database
     engine = create_engine(f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{DATABASE_NAME}')
