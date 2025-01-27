@@ -1,0 +1,5 @@
+2025-01-26 13:56:26,310 - Starting to scrape the data from the website.
+2025-01-26 13:56:33,232 - Data saved to CSV file: largest_banks.csv
+2025-01-26 13:56:35,210 - Database banks already exists. Skipping creation.
+2025-01-26 13:56:35,215 - Connecting to the database banks.
+2025-01-26 13:56:35,931 - Data loaded to the database table Largest Banks.
